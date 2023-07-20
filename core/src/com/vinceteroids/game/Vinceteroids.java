@@ -1,31 +1,46 @@
 package com.vinceteroids.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.sun.org.apache.xpath.internal.operations.Or;
+import com.vinceteroids.game.entity.Ship;
+import com.vinceteroids.game.screen.MainMenuScreen;
+import jdk.xml.internal.JdkConstants;
 
-public class Vinceteroids extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
-	
+import javax.tools.JavaCompiler;
+import java.awt.*;
+
+public class Vinceteroids extends Game {
+	public BitmapFont font;
+	public SpriteBatch spriteBatch;
+	public ShapeRenderer shapeRenderer;
+	public OrthographicCamera camera;
+
 	@Override
 	public void create () {
-		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+		spriteBatch = new SpriteBatch();
+		shapeRenderer = new ShapeRenderer();
+		font = new BitmapFont();
+		camera = new OrthographicCamera();
+		this.setScreen(new MainMenuScreen(this));
+
 	}
 
 	@Override
 	public void render () {
-		ScreenUtils.clear(1, 0, 0, 1);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+		super.render();
 	}
 	
 	@Override
 	public void dispose () {
-		batch.dispose();
-		img.dispose();
+		spriteBatch.dispose();
+		font.dispose();
+
 	}
 }
