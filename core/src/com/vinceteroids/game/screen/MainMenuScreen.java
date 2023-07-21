@@ -3,23 +3,31 @@ package com.vinceteroids.game.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.vinceteroids.game.Vinceteroids;
 
-public class MainMenuScreen implements Screen {
+public class MainMenuScreen extends ScreenAdapter {
 
-    final Vinceteroids game;
     final int windowWidth = Gdx.graphics.getWidth();
     final int windowHeight = Gdx.graphics.getHeight();
 
+    Vinceteroids game;
     OrthographicCamera camera;
+    SpriteBatch spriteBatch;
+    BitmapFont font;
 
-    public MainMenuScreen(Vinceteroids game) {
-        this.game = game;
-        camera = game.camera;
-        camera.setToOrtho(false, windowWidth, windowHeight);
+    public MainMenuScreen() {
+        game = Vinceteroids.get();
+        camera = game.getCamera();
+        spriteBatch = game.getSpriteBatch();
+        font = game.getFont();
+        font.setColor(Color.WHITE);
+
     }
 
     @Override
@@ -32,14 +40,14 @@ public class MainMenuScreen implements Screen {
         ScreenUtils.clear(Color.BLACK);
 
         camera.update();
-        game.spriteBatch.setProjectionMatrix(camera.combined);
+        spriteBatch.setProjectionMatrix(camera.combined);
 
-        game.spriteBatch.begin();
-        game.font.draw(game.spriteBatch, "Welcome to Vinceteroids\n\nPress any key to begin", windowHeight / 2, (windowHeight / 2) + 80);
-        game.spriteBatch.end();
+        spriteBatch.begin();
+        font.draw(spriteBatch, "Welcome to Vinceteroids\n\nPress any key to begin", game.getScreenCenter().x, game.getScreenCenter().y);
+        spriteBatch.end();
 
         if(Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)){
-            game.setScreen(new GameScreen(game));
+            game.setScreen(new GameScreen());
             dispose();
         }
     }

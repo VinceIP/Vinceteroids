@@ -1,6 +1,7 @@
 package com.vinceteroids.game.entity;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -15,10 +16,12 @@ public class Entity extends ApplicationAdapter {
     ShapeRenderer shapeRenderer;
     OrthographicCamera camera;
 
-    public Entity(Vinceteroids game){
-        this.game = game;
-        this.shapeRenderer = game.shapeRenderer;
-        this.camera = game.camera;
+    float x, y;
+
+    public Entity(){
+        this.game = Vinceteroids.get();
+        this.shapeRenderer = game.getShapeRenderer();
+        this.camera = game.getCamera();
     }
 
     public void create(){
@@ -31,5 +34,13 @@ public class Entity extends ApplicationAdapter {
     public void resume(){}
 
     public void dispose(){}
+
+    public void keyEvent(int key){
+
+    }
+
+    public void keyEventUp(int key){
+
+    }
 
 }
