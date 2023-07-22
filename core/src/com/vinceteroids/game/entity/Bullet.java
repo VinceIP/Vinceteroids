@@ -15,11 +15,10 @@ public class Bullet extends Entity implements Pool.Poolable {
     Circle circle;
     long timeCreated;
     float size = 3.5f;
-    float speed = 7f;
+    float speed = 9f;
 
     public Bullet() {
         alive = false;
-        game.getEntityList().add(this);
         create();
     }
 
@@ -43,7 +42,7 @@ public class Bullet extends Entity implements Pool.Poolable {
         setPosition(new Vector2(0, 0));
         game.getGameHandler().getActiveBullets().removeIndex(
                 game.getGameHandler().getActiveBullets().size - 1
-    );
+        );
         alive = false;
     }
 

@@ -87,7 +87,7 @@ public class Ship extends Entity {
     }
 
     public void fire() {
-        if(gameHandler.getActiveBullets().size < gameHandler.getMaxBullets()){
+        if (gameHandler.getActiveBullets().size < gameHandler.getMaxBullets()) {
             Bullet bullet = gameHandler.getBulletPool().obtain();
             //Get coords of ship's upper vertex
             Vector2 position = new Vector2(

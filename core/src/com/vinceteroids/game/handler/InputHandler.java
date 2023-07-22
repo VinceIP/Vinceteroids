@@ -7,7 +7,7 @@ import com.vinceteroids.game.entity.Entity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InputHandler{
+public class InputHandler {
 
     public final int UP = Input.Keys.W;
     public final int LEFT = Input.Keys.A;
@@ -25,14 +25,15 @@ public class InputHandler{
         listeners.add(entity);
     }
 
-    public void getKeyPress(){
+    public void getKeyPress() {
         int key = 0;
-        if(Gdx.input.isKeyPressed(LEFT)) key = LEFT;
-        else if(Gdx.input.isKeyPressed(RIGHT)) key = RIGHT;
-        else if(Gdx.input.isKeyPressed(UP)) key = UP;
-        if(Gdx.input.isKeyJustPressed(FIRE)) key = FIRE;
+        if (Gdx.input.isKeyPressed(LEFT)) key = LEFT;
+        else if (Gdx.input.isKeyPressed(RIGHT)) key = RIGHT;
+        else if (Gdx.input.isKeyPressed(UP)) key = UP;
+        if (Gdx.input.isKeyJustPressed(FIRE)) key = FIRE;
         keyDown(key);
     }
+
     public void keyDown(int keycode) {
         for (Entity e : listeners) {
             e.keyEvent(keycode);

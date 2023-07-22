@@ -17,7 +17,7 @@ public class Entity extends ApplicationAdapter {
     ShapeRenderer shapeRenderer;
     OrthographicCamera camera;
 
-    Vector2 position = new Vector2(0,0);
+    Vector2 position = new Vector2(0, 0);
     float angle;
     Polygon polygon;
 

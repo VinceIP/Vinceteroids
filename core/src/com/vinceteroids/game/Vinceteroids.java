@@ -73,7 +73,7 @@ public class Vinceteroids extends Game {
         return activeBullets;
     }
 
-    public void addEntity(Entity entity){
+    public void addEntity(Entity entity) {
         entityList.add(entity);
     }
 

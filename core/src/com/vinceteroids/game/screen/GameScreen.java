@@ -1,13 +1,12 @@
 package com.vinceteroids.game.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.vinceteroids.game.Vinceteroids;
+import com.vinceteroids.game.entity.Asteroid;
 import com.vinceteroids.game.entity.Entity;
 import com.vinceteroids.game.entity.Ship;
 import com.vinceteroids.game.handler.GameHandler;
@@ -27,7 +26,13 @@ public class GameScreen extends ScreenAdapter {
         this.camera = game.getCamera();
         this.shapeRenderer = game.getShapeRenderer();
         gameHandler.getBulletPool().fill(gameHandler.getBulletPool().max);
+        gameHandler.getAsteroidPool().fill(3);
         ship.create();
+        for (int i = 0; i < 4; i++) {
+            Asteroid tester = gameHandler.getAsteroidPool().obtain();
+            tester.wake();
+        }
+
     }
 
     @Override
