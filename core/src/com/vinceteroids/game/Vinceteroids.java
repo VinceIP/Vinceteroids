@@ -1,86 +1,109 @@
 package com.vinceteroids.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.sun.org.apache.xpath.internal.operations.Or;
-import com.vinceteroids.game.entity.Ship;
+import com.vinceteroids.game.entity.Entity;
+import com.vinceteroids.game.handler.GameHandler;
 import com.vinceteroids.game.handler.InputHandler;
 import com.vinceteroids.game.screen.MainMenuScreen;
-import jdk.xml.internal.JdkConstants;
 
-import javax.tools.JavaCompiler;
-import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Vinceteroids extends Game {
-	private static Vinceteroids game;
-	private BitmapFont font;
-	private SpriteBatch spriteBatch;
-	private ShapeRenderer shapeRenderer;
-	private OrthographicCamera camera;
-	private InputHandler inputHandler;
-	private Vector2 screenCenter;
+    private static Vinceteroids game;
+    public static final int MAX_BULLETS = 4;
+    public int activeBullets = 0;
+    public int bulletCount = 0;
+    private BitmapFont font;
+    private SpriteBatch spriteBatch;
+    private ShapeRenderer shapeRenderer;
+    private OrthographicCamera camera;
 
-	public static Vinceteroids get(){
-		return game;
-	}
+    private InputHandler inputHandler;
+    private GameHandler gameHandler;
 
-	public BitmapFont getFont() {
-		return font;
-	}
+    private Vector2 screenCenter;
+    private List<Entity> entityList;
 
-	public SpriteBatch getSpriteBatch() {
-		return spriteBatch;
-	}
+    public float deltaTIme;
 
-	public ShapeRenderer getShapeRenderer() {
-		return shapeRenderer;
-	}
+    public static Vinceteroids get() {
+        return game;
+    }
 
-	public OrthographicCamera getCamera() {
-		return camera;
-	}
+    public BitmapFont getFont() {
+        return font;
+    }
 
-	public InputHandler getInputHandler() {
-		return inputHandler;
-	}
+    public SpriteBatch getSpriteBatch() {
+        return spriteBatch;
+    }
 
-	public Vector2 getScreenCenter(){
-		return screenCenter;
-	}
+    public ShapeRenderer getShapeRenderer() {
+        return shapeRenderer;
+    }
 
-	@Override
-	public void create () {
-		game = this;
-		inputHandler = new InputHandler();
-		//Gdx.input.setInputProcessor(inputHandler);
-		spriteBatch = new SpriteBatch();
-		shapeRenderer = new ShapeRenderer();
-		font = new BitmapFont();
-		camera = new OrthographicCamera();
-		screenCenter = new Vector2((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
-		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		this.setScreen(new MainMenuScreen());
-	}
+    public OrthographicCamera getCamera() {
+        return camera;
+    }
 
-	@Override
-	public void render () {
-		inputHandler.getKeyPress();
-		super.render();
-	}
-	
-	@Override
-	public void dispose () {
-		spriteBatch.dispose();
-		font.dispose();
+    public InputHandler getInputHandler() {
+        return inputHandler;
+    }
 
-	}
+    public GameHandler getGameHandler() {
+        return gameHandler;
+    }
+
+    public Vector2 getScreenCenter() {
+        return screenCenter;
+    }
+
+    public List<Entity> getEntityList() {
+        return entityList;
+    }
+
+    public int getActiveBullets() {
+        return activeBullets;
+    }
+
+    public void addEntity(Entity entity){
+        entityList.add(entity);
+    }
+
+    @Override
+    public void create() {
+        game = this;
+        inputHandler = new InputHandler();
+        gameHandler = new GameHandler();
+        //Gdx.input.setInputProcessor(inputHandler);
+        spriteBatch = new SpriteBatch();
+        shapeRenderer = new ShapeRenderer();
+        font = new BitmapFont();
+        camera = new OrthographicCamera();
+        entityList = new ArrayList<>();
+        screenCenter = new Vector2((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
+        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        this.setScreen(new MainMenuScreen());
+    }
+
+    @Override
+    public void render() {
+        deltaTIme = Gdx.graphics.getDeltaTime();
+        inputHandler.getKeyPress();
+        super.render();
+    }
+
+    @Override
+    public void dispose() {
+        spriteBatch.dispose();
+        font.dispose();
+
+    }
 }

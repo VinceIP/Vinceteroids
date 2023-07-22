@@ -8,20 +8,25 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.vinceteroids.game.Vinceteroids;
+import com.vinceteroids.game.entity.Entity;
 import com.vinceteroids.game.entity.Ship;
+import com.vinceteroids.game.handler.GameHandler;
 
 public class GameScreen extends ScreenAdapter {
 
     final Vinceteroids game;
+    GameHandler gameHandler;
     OrthographicCamera camera;
     ShapeRenderer shapeRenderer;
     Ship ship;
+
     public GameScreen() {
         this.game = Vinceteroids.get();
+        this.gameHandler = game.getGameHandler();
         this.ship = new Ship();
         this.camera = game.getCamera();
         this.shapeRenderer = game.getShapeRenderer();
-
+        gameHandler.getBulletPool().fill(gameHandler.getBulletPool().max);
         ship.create();
     }
 
@@ -31,7 +36,9 @@ public class GameScreen extends ScreenAdapter {
         shapeRenderer.setAutoShapeType(true);
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin();
-        ship.render();
+        for (Entity e : game.getEntityList()) {
+            e.render();
+        }
         shapeRenderer.end();
     }
 

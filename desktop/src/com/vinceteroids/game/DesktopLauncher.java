@@ -11,7 +11,7 @@ public class DesktopLauncher {
 		config.setTitle("Vinceteroids");
 
 		config.setForegroundFPS(60);
-		config.useVsync(true);
+		config.useVsync(false);
 		config.setWindowedMode(800, 600);
 		new Lwjgl3Application(new Vinceteroids(), config);
 	}

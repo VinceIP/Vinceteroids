@@ -1,11 +1,12 @@
 package com.vinceteroids.game.entity;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.vinceteroids.game.Vinceteroids;
+import com.badlogic.gdx.math.Polygon;
+
 
 /**
  * Renderable, on-screen entity that can have custom behaviours
@@ -16,31 +17,50 @@ public class Entity extends ApplicationAdapter {
     ShapeRenderer shapeRenderer;
     OrthographicCamera camera;
 
-    float x, y;
+    Vector2 position = new Vector2(0,0);
+    float angle;
+    Polygon polygon;
 
-    public Entity(){
+    public Entity() {
         this.game = Vinceteroids.get();
         this.shapeRenderer = game.getShapeRenderer();
         this.camera = game.getCamera();
     }
 
-    public void create(){
+    public void create() {
+        shapeRenderer = game.getShapeRenderer();
+        game.addEntity(this);
     }
 
-    public void render(){}
+    public void render() {
+    }
 
-    public void pause(){}
+    public void pause() {
+    }
 
-    public void resume(){}
+    public void resume() {
+    }
 
-    public void dispose(){}
+    public void dispose() {
+    }
 
-    public void keyEvent(int key){
+    public void keyEvent(int key) {
 
     }
 
-    public void keyEventUp(int key){
-
+    public Vector2 getPosition() {
+        return position;
     }
 
+    public void setPosition(Vector2 position) {
+        this.position = position;
+    }
+
+    public float getAngle() {
+        return angle;
+    }
+
+    public void setAngle(float angle) {
+        this.angle = angle + 90;
+    }
 }

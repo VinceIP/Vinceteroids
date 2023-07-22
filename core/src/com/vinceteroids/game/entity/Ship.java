@@ -3,70 +3,71 @@ package com.vinceteroids.game.entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Vector2;
+import com.vinceteroids.game.Vinceteroids;
+import com.vinceteroids.game.handler.GameHandler;
 import com.vinceteroids.game.handler.InputHandler;
-import jdk.internal.access.SharedSecrets;
 
-public class Ship extends Entity implements Loopable{
+public class Ship extends Entity {
 
     InputHandler inputHandler;
+    GameHandler gameHandler;
     BitmapFont font;
-    ShapeRenderer shapeRenderer;
 
-    final float ROTATE_SPEED = 1.95f;
+    final float ROTATE_SPEED = 3.75f;
     final float ACCEL_RATE = 0.25f;
-    final float DECEL_RATE = 0.15f;
+    final float DECEL_RATE = 0.45f;
     final float MAX_SPEED = 5f;
 
     float thrustX;
     float thrustY;
-    float thrustPower = 0f;
-    float vX, vY;
     float accel = 0;
-    float decel = 0;
-    float angle = 0;
 
     float[] vertices = {
-            0f, 20f,      // Top vertex
-            12f, -12f,    // Bottom-right vertex
-            0f, -4f,      // Inner vertex
-            -12f, -12f    // Bottom-left vertex
+            0f, 20f,
+            12f, -12f,
+            0f, -4f,
+            -12f, -12f
     };
-
-    Polygon polygon;
 
     public Ship() {
         super();
         font = game.getFont();
+        gameHandler = game.getGameHandler();
     }
 
-    public void create(){
+    public void create() {
+        super.create();
         inputHandler = game.getInputHandler();
         inputHandler.registerListener(this);
-        shapeRenderer = game.getShapeRenderer();
         polygon = new Polygon(vertices);
+
         //Adjust vertices relative to screen
-        for (int i = 0; i < vertices.length; i++) {
-            if(i%2 == 0) vertices[i] = vertices[i] + game.getScreenCenter().x;
-            else vertices[i] = vertices[i] + game.getScreenCenter().y;
-        }
-        polygon.setOrigin(game.getScreenCenter().x,game.getScreenCenter().y);
+//        for (int i = 0; i < vertices.length; i++) {
+//            if (i % 2 == 0) vertices[i] = vertices[i] + game.getScreenCenter().x;
+//            else vertices[i] = vertices[i] + game.getScreenCenter().y;
+//        }
+        polygon.setOrigin(vertices[4], vertices[5]);
+        polygon.setPosition(game.getScreenCenter().x, game.getScreenCenter().y);
         vertices = polygon.getTransformedVertices();
     }
 
-    public void render(){
+    @Override
+    public void render() {
+        super.render();
+        Loopable.loop(polygon);
         rotate();
         move();
-        loop();
         game.getSpriteBatch().begin();
 
         //Debug draw
-        font.draw(game.getSpriteBatch(), "Ship speed = " + String.valueOf(accel) + "\n" +
-                "Ship angle: " + String.valueOf(angle) + "\n" +
-                "x: " + x + "\ny: " + y,
-                (game.getScreenCenter().x - (int)(game.getScreenCenter().x * 0.98)),
-                (game.getScreenCenter().y + (int)(game.getScreenCenter().y * 0.98)));
+        font.draw(game.getSpriteBatch(), "Ship speed = " + accel + "\n" +
+                        "Ship angle: " + angle + "\n" +
+                        "x: " + (int) polygon.getX() +
+                        "\ny: " + (int) polygon.getY(),
+                (game.getScreenCenter().x - (int) (game.getScreenCenter().x * 0.98)),
+                (game.getScreenCenter().y + (int) (game.getScreenCenter().y * 0.98)));
 
         shapeRenderer.setColor(Color.WHITE);
         shapeRenderer.polygon(polygon.getTransformedVertices());
@@ -75,61 +76,57 @@ public class Ship extends Entity implements Loopable{
 
     }
 
-    public void loop(){
-        x = polygon.getX();
-        y = polygon.getY();
-        int screenW = Gdx.graphics.getWidth() / 2;
-        int screenH = Gdx.graphics.getHeight() / 2;
-        if(x > screenW) x = -screenW;
-        else if(x < -screenW) x = screenW;
-        if(y > screenH) y = -screenH;
-        else if(y < -screenH) y = screenH;
-        polygon.setPosition(x,y);
-    }
-
     @Override
-    public void keyEvent(int key){
-        if(key == inputHandler.LEFT) angle += ROTATE_SPEED;
-        else if(key == inputHandler.RIGHT) angle -= ROTATE_SPEED;
-        else if(key == inputHandler.UP){
-            thrust();
+    public void keyEvent(int key) {
+        if (key == inputHandler.LEFT) angle += ROTATE_SPEED;
+        else if (key == inputHandler.RIGHT) angle -= ROTATE_SPEED;
+        else if (key == inputHandler.UP) thrust();
+        else if (key == inputHandler.FIRE) {
+            fire();
         }
     }
 
-    @Override
-    public void keyEventUp(int key){
+    public void fire() {
+        if(gameHandler.getActiveBullets().size < gameHandler.getMaxBullets()){
+            Bullet bullet = gameHandler.getBulletPool().obtain();
+            //Get coords of ship's upper vertex
+            Vector2 position = new Vector2(
+                    vertices[0], vertices[1]
+            );
+            bullet.wake(position, polygon.getRotation());
+        }
+
     }
 
-    public void rotate(){
+    public void rotate() {
         //Clamp rotation and set
-        if(angle > 360) angle = 0;
-        else if (angle < 0) angle = 360;
         polygon.setRotation(angle);
     }
 
-    public void move(){
+    public void move() {
         //Apply unrealistic special space friction and clamp acceleration
         accel -= DECEL_RATE * Gdx.graphics.getDeltaTime();
-        if(accel > MAX_SPEED) accel = MAX_SPEED;
-        else if(accel < 0) accel = 0;
+        if (accel > MAX_SPEED) accel = MAX_SPEED;
+        else if (accel < 0) accel = 0;
 
         //Calculate speed vector using Pythagorean Theorem
-        float speedVector = (float)Math.sqrt(thrustX * thrustX + thrustY * thrustY);
+        float speedVector = (float) Math.sqrt(thrustX * thrustX + thrustY * thrustY);
 
-        if(speedVector > 0){
+        if (speedVector > 0) {
             thrustX -= (thrustX / speedVector) * DECEL_RATE * Gdx.graphics.getDeltaTime();
             thrustY -= (thrustY / speedVector) * DECEL_RATE * Gdx.graphics.getDeltaTime();
         }
-        if(speedVector > MAX_SPEED){
+        if (speedVector > MAX_SPEED) {
             thrustX = (thrustX / speedVector) * MAX_SPEED;
             thrustY = (thrustY / speedVector) * MAX_SPEED;
 
         }
-        polygon.translate(thrustY,thrustX);
+        polygon.translate(thrustY, thrustX);
+        position = new Vector2(polygon.getX(), polygon.getY());
 
     }
 
-    public void thrust(){
+    public void thrust() {
         //Increase acceleration
         accel += ACCEL_RATE;
         //Calculate forward velocity
