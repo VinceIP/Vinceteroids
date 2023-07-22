@@ -15,6 +15,7 @@ public class Ship extends Entity {
     GameHandler gameHandler;
     BitmapFont font;
 
+    //Const properties
     final float ROTATE_SPEED = 3.75f;
     final float ACCEL_RATE = 0.25f;
     final float DECEL_RATE = 0.45f;
@@ -24,6 +25,7 @@ public class Ship extends Entity {
     float thrustY;
     float accel = 0;
 
+    //The vertices of the ship's polygon
     float[] vertices = {
             0f, 20f,
             12f, -12f,
@@ -35,19 +37,17 @@ public class Ship extends Entity {
         super();
         font = game.getFont();
         gameHandler = game.getGameHandler();
+        create();
     }
 
     public void create() {
         super.create();
         inputHandler = game.getInputHandler();
+        //Tell input handler that this ship is listening for key presses
         inputHandler.registerListener(this);
         polygon = new Polygon(vertices);
 
-        //Adjust vertices relative to screen
-//        for (int i = 0; i < vertices.length; i++) {
-//            if (i % 2 == 0) vertices[i] = vertices[i] + game.getScreenCenter().x;
-//            else vertices[i] = vertices[i] + game.getScreenCenter().y;
-//        }
+        //Set the ships origin at its "engine", center it on screen
         polygon.setOrigin(vertices[4], vertices[5]);
         polygon.setPosition(game.getScreenCenter().x, game.getScreenCenter().y);
         vertices = polygon.getTransformedVertices();
@@ -56,7 +56,9 @@ public class Ship extends Entity {
     @Override
     public void render() {
         super.render();
-        Loopable.loop(polygon);
+        //Check if the ship needs to loop to the opposite side of screen
+        //Handle rotation and movement
+        Loopable.loop(this);
         rotate();
         move();
         game.getSpriteBatch().begin();
@@ -78,6 +80,7 @@ public class Ship extends Entity {
 
     @Override
     public void keyEvent(int key) {
+        //Get keys from inputHandler and do the things
         if (key == inputHandler.LEFT) angle += ROTATE_SPEED;
         else if (key == inputHandler.RIGHT) angle -= ROTATE_SPEED;
         else if (key == inputHandler.UP) thrust();
@@ -87,6 +90,7 @@ public class Ship extends Entity {
     }
 
     public void fire() {
+        //If there's less than 4 active bullets on screen, grab a new one from the pool and shoot it
         if (gameHandler.getActiveBullets().size < gameHandler.getMaxBullets()) {
             Bullet bullet = gameHandler.getBulletPool().obtain();
             //Get coords of ship's upper vertex
@@ -99,7 +103,6 @@ public class Ship extends Entity {
     }
 
     public void rotate() {
-        //Clamp rotation and set
         polygon.setRotation(angle);
     }
 
@@ -110,6 +113,7 @@ public class Ship extends Entity {
         else if (accel < 0) accel = 0;
 
         //Calculate speed vector using Pythagorean Theorem
+        //I don't claim to understand the math
         float speedVector = (float) Math.sqrt(thrustX * thrustX + thrustY * thrustY);
 
         if (speedVector > 0) {
@@ -121,6 +125,7 @@ public class Ship extends Entity {
             thrustY = (thrustY / speedVector) * MAX_SPEED;
 
         }
+        //Apply new translation each frame
         polygon.translate(thrustY, thrustX);
         position = new Vector2(polygon.getX(), polygon.getY());
 

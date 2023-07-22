@@ -3,7 +3,7 @@ package com.vinceteroids.game.entity;
 import com.badlogic.gdx.math.MathUtils;
 
 public class AsteroidGenerator {
-    private static final int NUM_VERTICES = 10;
+    private static final int NUM_VERTICES = 12;
     private static final float MIN_RADIUS = 20f;
     private static final float MAX_RADIUS = 40f;
 

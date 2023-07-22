@@ -17,9 +17,7 @@ import java.util.List;
 
 public class Vinceteroids extends Game {
     private static Vinceteroids game;
-    public static final int MAX_BULLETS = 4;
     public int activeBullets = 0;
-    public int bulletCount = 0;
     private BitmapFont font;
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
@@ -33,6 +31,7 @@ public class Vinceteroids extends Game {
 
     public float deltaTIme;
 
+    //Get main game instance from anywhere
     public static Vinceteroids get() {
         return game;
     }
@@ -61,6 +60,10 @@ public class Vinceteroids extends Game {
         return gameHandler;
     }
 
+    public void setGameHandler(GameHandler gameHandler) {
+        this.gameHandler = gameHandler;
+    }
+
     public Vector2 getScreenCenter() {
         return screenCenter;
     }
@@ -69,20 +72,15 @@ public class Vinceteroids extends Game {
         return entityList;
     }
 
-    public int getActiveBullets() {
-        return activeBullets;
-    }
-
     public void addEntity(Entity entity) {
         entityList.add(entity);
     }
 
+    //Main entry point
     @Override
     public void create() {
         game = this;
         inputHandler = new InputHandler();
-        gameHandler = new GameHandler();
-        //Gdx.input.setInputProcessor(inputHandler);
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
@@ -90,9 +88,11 @@ public class Vinceteroids extends Game {
         entityList = new ArrayList<>();
         screenCenter = new Vector2((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        //Load the menu screen
         this.setScreen(new MainMenuScreen());
     }
 
+    //Listen for key press every frame
     @Override
     public void render() {
         deltaTIme = Gdx.graphics.getDeltaTime();

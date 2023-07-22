@@ -29,6 +29,7 @@ public class Entity extends ApplicationAdapter {
 
     public void create() {
         shapeRenderer = game.getShapeRenderer();
+        //Entities add themselves to the list at creation, so the engine knows to render them
         game.addEntity(this);
     }
 

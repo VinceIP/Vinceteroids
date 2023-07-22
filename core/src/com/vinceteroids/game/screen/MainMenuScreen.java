@@ -13,9 +13,6 @@ import com.vinceteroids.game.Vinceteroids;
 
 public class MainMenuScreen extends ScreenAdapter {
 
-    final int windowWidth = Gdx.graphics.getWidth();
-    final int windowHeight = Gdx.graphics.getHeight();
-
     Vinceteroids game;
     OrthographicCamera camera;
     SpriteBatch spriteBatch;
@@ -47,6 +44,7 @@ public class MainMenuScreen extends ScreenAdapter {
         spriteBatch.end();
 
         if(Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)){
+            //Switch to game screen and terminate this one
             game.setScreen(new GameScreen());
             dispose();
         }
