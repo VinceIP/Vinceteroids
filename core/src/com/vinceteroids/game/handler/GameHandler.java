@@ -1,5 +1,6 @@
 package com.vinceteroids.game.handler;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -69,6 +70,13 @@ public class GameHandler {
             //Get an asteroid from the pool and wake it up. Asteroids know how to reset themselves to new values
             Asteroid a = getAsteroidPool().obtain();
             a.wake();
+        }
+    }
+
+    public void spawnAsteroids(Vector2 position, int count, int size){
+        for (int i = 0; i < count; i++) {
+            Asteroid a = getAsteroidPool().obtain();
+            a.wake(position, size);
         }
     }
 

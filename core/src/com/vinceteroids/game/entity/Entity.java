@@ -33,6 +33,10 @@ public class Entity extends ApplicationAdapter {
         game.addEntity(this);
     }
 
+    public void die() {
+        //game.removeEntity(this);
+    }
+
     public void render() {
     }
 

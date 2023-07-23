@@ -30,7 +30,9 @@ public class Vinceteroids extends Game {
     private List<Entity> entityList;
 
     public float deltaTIme;
+    public boolean waitForNextFrame = false;
 
+    public List<Entity> toDie = new ArrayList<>();
     //Get main game instance from anywhere
     public static Vinceteroids get() {
         return game;
@@ -72,8 +74,12 @@ public class Vinceteroids extends Game {
         return entityList;
     }
 
+
     public void addEntity(Entity entity) {
         entityList.add(entity);
+    }
+    public void removeEntity(Entity entity){
+        entityList.remove(entity);
     }
 
     //Main entry point

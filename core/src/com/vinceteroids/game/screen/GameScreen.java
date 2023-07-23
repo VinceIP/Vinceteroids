@@ -9,6 +9,9 @@ import com.vinceteroids.game.Vinceteroids;
 import com.vinceteroids.game.entity.Entity;
 import com.vinceteroids.game.handler.GameHandler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameScreen extends ScreenAdapter {
 
     final Vinceteroids game;
@@ -29,13 +32,17 @@ public class GameScreen extends ScreenAdapter {
     public void render(float delta) {
         //Process game logic
         gameHandler.update();
+        List<Entity> entityListCopy;
+        synchronized (game.getEntityList()){
+            entityListCopy = new ArrayList<>(game.getEntityList());
+        }
         //Erase the previous frame and render a new one
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         shapeRenderer.setAutoShapeType(true);
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin();
         //Each entity (game object) in the list renders/updates itself here
-        for (Entity e : game.getEntityList()) {
+        for (Entity e : entityListCopy) {
             e.render();
         }
         shapeRenderer.end();
