@@ -56,7 +56,6 @@ public class GameHandler {
         //At one second, spawn in asteroids and increase the level
         if(timePassed - timeCreated > 1000 && difficultyLevel < 1){
             difficultyLevel++;
-            System.out.println("spawn");
             spawnAsteroids(5);
         }
         //For now, spawn 2 asteroids if there are less than 7 on screen

@@ -26,7 +26,6 @@ public class Asteroid extends Entity implements Pool.Poolable {
     int offset = 50;
 
     float[] vertices;
-    Array<Vector2> verticesArray;
 
     public Asteroid() {
         alive = false;
@@ -36,7 +35,6 @@ public class Asteroid extends Entity implements Pool.Poolable {
 
     public void create() {
         super.create();
-        verticesArray = new Array<>();
         polygon = new Polygon();
     }
 
@@ -44,11 +42,6 @@ public class Asteroid extends Entity implements Pool.Poolable {
         //When woken up, generate a new shape and spawn into a random screen edge
         vertices = AsteroidGenerator.generateVertices();
         polygon.setVertices(vertices);
-        for (int i = 0; i < vertices.length; i = i + 2) {
-            verticesArray.add(
-                    new Vector2(i, i + 1)
-            );
-        }
         setRandomStatus();
         gameHandler.getActiveAsteroids().add(this);
         alive = true;
@@ -58,11 +51,6 @@ public class Asteroid extends Entity implements Pool.Poolable {
         //When woken up, generate a new shape and spawn at pos with size
         vertices = AsteroidGenerator.generateVertices();
         polygon.setVertices(vertices);
-        for (int i = 0; i < vertices.length; i = i + 2) {
-            verticesArray.add(
-                    new Vector2(i, i + 1)
-            );
-        }
         this.size = size;
         this.polygon.setPosition(position.x, position.y);
         setStatus();
@@ -132,15 +120,16 @@ public class Asteroid extends Entity implements Pool.Poolable {
     }
 
     public void handleCollision() {
-        List<Bullet> bulletsToDie = new ArrayList<>();
-        //List<Asteroid> asteroidsToDie = new ArrayList<>();
         for (Bullet b : gameHandler.getActiveBullets()) {
             if (isColliding(polygon, b.circle)) {
                 die();
-                bulletsToDie.add(b);
+                b.die();
             }
         }
-        for(Bullet b: bulletsToDie) b.die();
+        Polygon ship = Ship.get().polygon;
+        if(!Ship.get().dying && polygon.contains(ship.getX(), ship.getY())){
+            Ship.get().die();
+        }
     }
 
     @Override
@@ -161,28 +150,6 @@ public class Asteroid extends Entity implements Pool.Poolable {
     }
 
     public boolean isColliding(Polygon p, Circle c) {
-        float[] polyVertices = p.getTransformedVertices();
-        Vector2 circleCenter = new Vector2(c.x, c.y);
-        float squareRadius = c.radius * c.radius;
-        for (int i = 0; i < vertices.length; i = i + 2) {
-            if (i == 0) {
-                if (Intersector.intersectSegmentCircle(
-                        new Vector2(vertices[vertices.length - 2], vertices[vertices.length - 1]),
-                        new Vector2(vertices[i], vertices[i + 1]),
-                        circleCenter, squareRadius
-                )) {
-                    return true;
-                }
-            } else {
-                if (Intersector.intersectSegmentCircle(
-                        new Vector2(vertices[i - 2], vertices[i - 1]),
-                        new Vector2(vertices[i], vertices[i + 1]),
-                        circleCenter, squareRadius
-                )) {
-                    return true;
-                }
-            }
-        }
         return p.contains(c.x, c.y);
     }
 
