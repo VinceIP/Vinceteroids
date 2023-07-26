@@ -38,20 +38,25 @@ public class Asteroid extends Entity implements Pool.Poolable {
         polygon = new Polygon();
     }
 
-    public void wake() {
-        //When woken up, generate a new shape and spawn into a random screen edge
-        vertices = AsteroidGenerator.generateVertices();
-        polygon.setVertices(vertices);
-        setRandomStatus();
-        gameHandler.getActiveAsteroids().add(this);
-        alive = true;
-    }
-
-    public void wake(Vector2 position, int size) {
+    public void wake(int size, float speed) {
         //When woken up, generate a new shape and spawn at pos with size
         vertices = AsteroidGenerator.generateVertices();
         polygon.setVertices(vertices);
         this.size = size;
+        this.speed = speed;
+        Vector2 position = getSafeSpawnZone();
+        this.polygon.setPosition(position.x, position.y);
+        setStatus();
+        gameHandler.getActiveAsteroids().add(this);
+        alive = true;
+    }
+
+    public void wake(Vector2 position, int size, float speed) {
+        //When woken up, generate a new shape and spawn at pos with size
+        vertices = AsteroidGenerator.generateVertices();
+        polygon.setVertices(vertices);
+        this.size = size;
+        this.speed = speed;
         this.polygon.setPosition(position.x, position.y);
         setStatus();
         gameHandler.getActiveAsteroids().add(this);
@@ -63,7 +68,7 @@ public class Asteroid extends Entity implements Pool.Poolable {
         float randAngle = MathUtils.random(0, 180);
         polygon.setRotation(polygon.getRotation() + randAngle);
         moveAngle = polygon.getRotation();
-        speed = MathUtils.random(speedMin, speedMax);
+        //speed = MathUtils.random(speedMin, speedMax);
         polygon.setScale((size) * sizeScaler, (size) * sizeScaler);
     }
 
@@ -107,14 +112,49 @@ public class Asteroid extends Entity implements Pool.Poolable {
 
     }
 
+    private Vector2 getSafeSpawnZone() {
+        Vector2 position = new Vector2();
+        float halfScreenWidth = Gdx.graphics.getWidth() / 2f;
+        float halfScreenHeight = Gdx.graphics.getHeight() / 2f;
+        int quadrant = MathUtils.random(1, 4);
+        float modifier = 0.45f;
+        switch (quadrant) {
+            case 1: // Top-left quadrant
+                position.set(
+                        MathUtils.random(-halfScreenWidth, -halfScreenWidth * modifier),
+                        MathUtils.random(halfScreenHeight * modifier, halfScreenHeight)
+                );
+                break;
+            case 2: // Top-right quadrant
+                position.set(
+                        MathUtils.random(halfScreenWidth * modifier, halfScreenWidth),
+                        MathUtils.random(halfScreenHeight * modifier, halfScreenHeight)
+                );
+                break;
+            case 3: // Bottom-left quadrant
+                position.set(
+                        MathUtils.random(-halfScreenWidth, -halfScreenWidth * modifier),
+                        MathUtils.random(-halfScreenHeight, -halfScreenHeight * modifier)
+                );
+                break;
+            case 4: // Bottom-right quadrant
+                position.set(
+                        MathUtils.random(halfScreenWidth * modifier, halfScreenWidth),
+                        MathUtils.random(-halfScreenHeight, -halfScreenHeight * modifier)
+                );
+                break;
+        }
+        return position;
+    }
+
     public void rotate() {
         polygon.rotate(rotateSpeed);
     }
 
     public void move() {
         //Move based on forward vector of initial angle
-        float moveX = (float) Math.cos(Math.toRadians(moveAngle)) * speed * game.deltaTIme;
-        float moveY = (float) Math.sin(Math.toRadians(moveAngle)) * speed * game.deltaTIme;
+        float moveX = (float) Math.cos(moveAngle) * speed * game.deltaTIme;
+        float moveY = (float) Math.sin(moveAngle) * speed * game.deltaTIme;
         polygon.translate(moveX, moveY);
 
     }
@@ -127,7 +167,7 @@ public class Asteroid extends Entity implements Pool.Poolable {
             }
         }
         Polygon ship = Ship.get().polygon;
-        if(!Ship.get().dying && polygon.contains(ship.getX(), ship.getY())){
+        if (!Ship.get().dying && polygon.contains(ship.getX(), ship.getY())) {
             Ship.get().die();
         }
     }
@@ -140,11 +180,16 @@ public class Asteroid extends Entity implements Pool.Poolable {
         );
         switch (size) {
             case 2:
-                gameHandler.spawnAsteroids(position, count, 1);
+                gameHandler.spawnAsteroid(position, 1, this.speed);
+                gameHandler.spawnAsteroid(position, 1, this.speed);
+                ;
                 break;
             case 3:
-                gameHandler.spawnAsteroids(position, count, 2);
+                gameHandler.spawnAsteroid(position, 2, this.speed);
+                gameHandler.spawnAsteroid(position, 2, this.speed);
+
         }
+        gameHandler.addScore(size);
         gameHandler.getAsteroidPool().free(this);
         gameHandler.getActiveAsteroids().removeValue(this, false);
     }

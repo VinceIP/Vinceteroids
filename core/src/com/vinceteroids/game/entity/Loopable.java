@@ -10,7 +10,7 @@ public interface Loopable {
     public static void loop(Entity entity) {
         int offset = 0;
         Polygon polygon = entity.polygon;
-        if(entity instanceof Asteroid) offset = 50;
+        if(entity instanceof Asteroid) offset = 35;
         float x = polygon.getX();
         float y = polygon.getY();
         int screenW = Gdx.graphics.getWidth() - 1;

@@ -8,11 +8,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.vinceteroids.game.Vinceteroids;
 import com.vinceteroids.game.handler.GameHandler;
 import com.vinceteroids.game.handler.InputHandler;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +33,6 @@ public class Ship extends Entity {
     public boolean dying = false;
     List<Polygon> splinters;
     List<Circle> explosion;
-    float explosionLife = 2f;
     float[] splinterAngles;
     float[] explosionAngles;
     long[] explosionCreateTime;
@@ -78,7 +75,6 @@ public class Ship extends Entity {
 
 // Set the ship's polygon origin to the center
         polygon.setOrigin(centerX, centerY);
-//        polygon.setOrigin(vertices[4], vertices[5]);
         polygon.setPosition(game.getScreenCenter().x, game.getScreenCenter().y);
         transformedVertices = polygon.getTransformedVertices();
     }
@@ -99,7 +95,8 @@ public class Ship extends Entity {
                         "x: " + (int) polygon.getX() +
                         "\ny: " + (int) polygon.getY(),
                 (game.getScreenCenter().x - (int) (game.getScreenCenter().x * 0.98)),
-                (game.getScreenCenter().y + (int) (game.getScreenCenter().y * 0.98)));
+                (game.getScreenCenter().y + (int) (game.getScreenCenter().y * -0.73)));
+        ////
 
         shapeRenderer.setColor(Color.WHITE);
         if (dying && splinters != null) {
@@ -107,6 +104,13 @@ public class Ship extends Entity {
                 shapeRenderer.polygon(p.getTransformedVertices());
             }
             for (Circle c : explosion) {
+                shapeRenderer.setColor(new Color(
+                        Color.rgb888(
+                                MathUtils.random(200, 255),
+                                MathUtils.random(100, 150),
+                                0
+                        )
+                ));
                 shapeRenderer.circle(c.x, c.y, c.radius);
             }
 
