@@ -17,7 +17,6 @@ import java.util.List;
 
 public class Vinceteroids extends Game {
     private static Vinceteroids game;
-    public int activeBullets = 0;
     private BitmapFont font;
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
@@ -29,10 +28,8 @@ public class Vinceteroids extends Game {
     private Vector2 screenCenter;
     private List<Entity> entityList;
 
-    public float deltaTIme;
-    public boolean waitForNextFrame = false;
+    public float deltaTime;
 
-    public List<Entity> toDie = new ArrayList<>();
     //Get main game instance from anywhere
     public static Vinceteroids get() {
         return game;
@@ -91,19 +88,23 @@ public class Vinceteroids extends Game {
         shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
         camera = new OrthographicCamera();
-        entityList = new ArrayList<>();
         screenCenter = new Vector2((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        //Load the menu screen
+        entityList = new ArrayList<>();
+        init();
+    }
+
+    public void init(){
+        entityList.clear();
         this.setScreen(new MainMenuScreen());
     }
 
     //Listen for key press every frame
     @Override
     public void render() {
-        deltaTIme = Gdx.graphics.getDeltaTime();
-        inputHandler.getKeyPress();
         super.render();
+        deltaTime = Gdx.graphics.getDeltaTime();
+        inputHandler.getKeyPress();
     }
 
     @Override
@@ -111,5 +112,9 @@ public class Vinceteroids extends Game {
         spriteBatch.dispose();
         font.dispose();
 
+    }
+
+    public static void Reset(){
+        game.init();
     }
 }

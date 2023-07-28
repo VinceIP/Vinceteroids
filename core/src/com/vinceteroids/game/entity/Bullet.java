@@ -3,13 +3,12 @@ package com.vinceteroids.game.entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class Bullet extends Entity implements Pool.Poolable {
-    final long LIFETIME = 1000;
+    final long LIFETIME = 1500;
     boolean alive;
     int id;
 
@@ -61,14 +60,14 @@ public class Bullet extends Entity implements Pool.Poolable {
     }
 
     public void checkForTimeout() {
-        if (TimeUtils.millis() - timeCreated >= LIFETIME) {
-            game.getGameHandler().getBulletPool().free(this);
+        if (TimeUtils.timeSinceMillis(timeCreated) >= LIFETIME) {
+            die();
         }
     }
 
     public void move() {
-        position.x += Math.cos(Math.toRadians(angle)) * speed * game.deltaTIme;
-        position.y += Math.sin(Math.toRadians(angle)) * speed * game.deltaTIme;
+        position.x += Math.cos(Math.toRadians(angle)) * speed * game.deltaTime;
+        position.y += Math.sin(Math.toRadians(angle)) * speed * game.deltaTime;
 
         // Implement looping manually, because bullets are basic circles and not polygons
         int screenW = Gdx.graphics.getWidth();
@@ -89,7 +88,7 @@ public class Bullet extends Entity implements Pool.Poolable {
     }
 
     @Override
-    public void die(){
+    public void die() {
         super.die();
         game.getGameHandler().getBulletPool().free(this);
         game.getGameHandler().getActiveBullets().removeValue(this, false);

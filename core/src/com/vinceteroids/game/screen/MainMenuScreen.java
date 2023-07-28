@@ -2,7 +2,6 @@ package com.vinceteroids.game.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -29,7 +28,6 @@ public class MainMenuScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-
     }
 
     @Override
@@ -40,10 +38,12 @@ public class MainMenuScreen extends ScreenAdapter {
         spriteBatch.setProjectionMatrix(camera.combined);
 
         spriteBatch.begin();
-        font.draw(spriteBatch, "Welcome to Vinceteroids\n\nPress any key to begin", game.getScreenCenter().x, game.getScreenCenter().y);
+        String display = "";
+        font.draw(spriteBatch, display +
+                "\n\nPress any key to begin", game.getScreenCenter().x, game.getScreenCenter().y);
         spriteBatch.end();
 
-        if(Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)){
+        if(Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY)){
             //Switch to game screen and terminate this one
             game.setScreen(new GameScreen());
             dispose();

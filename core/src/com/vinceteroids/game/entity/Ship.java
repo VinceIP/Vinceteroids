@@ -14,7 +14,7 @@ import com.vinceteroids.game.handler.InputHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Ship extends Entity {
+public class Ship extends Entity implements KeyListener{
     private static Ship ship;
 
     InputHandler inputHandler;
@@ -26,11 +26,14 @@ public class Ship extends Entity {
     final float ACCEL_RATE = 0.25f;
     final float DECEL_RATE = 0.45f;
     final float MAX_SPEED = 5f;
+    final long IMMUNITY_TIMER = 2500;
+    final long IMMUNITY_BLINK_RATE = 250;
 
     float thrustX;
     float thrustY;
     float accel = 0;
-    public boolean dying = false;
+    boolean dying = false;
+    boolean immune = false;
     List<Polygon> splinters;
     List<Circle> explosion;
     float[] splinterAngles;
@@ -38,6 +41,10 @@ public class Ship extends Entity {
     long[] explosionCreateTime;
     long[] explosionLifetime;
     int explosionParticleCount = 80;
+    long timeOfDeath;
+    long immunityStartTime;
+    boolean immuneBlink;
+    long lastBlinkTime;
 
     //The vertices of the ship's polygon
     float[] vertices = {
@@ -66,16 +73,32 @@ public class Ship extends Entity {
         inputHandler = game.getInputHandler();
         //Tell input handler that this ship is listening for key presses
         inputHandler.registerListener(this);
-        polygon = new Polygon(vertices);
+        reset(true);
+    }
 
+    public void reset(boolean isInitial) {
+        dying = false;
+        accel = 0;
+        thrustX = 0;
+        thrustY = 0;
+        if (!isInitial) {
+            immune = true;
+            immunityStartTime = TimeUtils.millis();
+        }
+        polygon = new Polygon(vertices);
         //Set the ships origin at its "engine", center it on screen
         // Calculate the center of the polygon
         float centerX = (vertices[0] + vertices[2] + vertices[4] + vertices[6]) / 4f;
         float centerY = (vertices[1] + vertices[3] + vertices[5] + vertices[7]) / 4f;
-
-// Set the ship's polygon origin to the center
+        // Set the ship's polygon origin to the center
         polygon.setOrigin(centerX, centerY);
-        polygon.setPosition(game.getScreenCenter().x, game.getScreenCenter().y);
+        Vector2 position = new Vector2();
+        if (isInitial) position.set(game.getScreenCenter().x, game.getScreenCenter().y);
+        else position.set(
+                (game.getScreenCenter().x + MathUtils.random(-300, 300)),
+                (game.getScreenCenter().y + MathUtils.random(-300, 300))
+        );
+        polygon.setPosition(position.x, position.y);
         transformedVertices = polygon.getTransformedVertices();
     }
 
@@ -93,12 +116,24 @@ public class Ship extends Entity {
         font.draw(game.getSpriteBatch(), "Ship speed = " + accel + "\n" +
                         "Ship angle: " + angle + "\n" +
                         "x: " + (int) polygon.getX() +
-                        "\ny: " + (int) polygon.getY(),
+                        "\ny: " + (int) polygon.getY() + "level: " + gameHandler.getGameLevel(),
                 (game.getScreenCenter().x - (int) (game.getScreenCenter().x * 0.98)),
                 (game.getScreenCenter().y + (int) (game.getScreenCenter().y * -0.73)));
         ////
 
-        shapeRenderer.setColor(Color.WHITE);
+        if (immune) {
+            if (TimeUtils.timeSinceMillis(immunityStartTime) > IMMUNITY_TIMER) {
+                immune = false;
+            } else {
+                if(TimeUtils.timeSinceMillis(lastBlinkTime) > IMMUNITY_BLINK_RATE){
+                    immuneBlink = !immuneBlink;
+                    lastBlinkTime = TimeUtils.millis();
+                }
+                if(immuneBlink) shapeRenderer.setColor(Color.BLACK);
+                else shapeRenderer.setColor(Color.WHITE);
+            }
+        }
+
         if (dying && splinters != null) {
             for (Polygon p : splinters) {
                 shapeRenderer.polygon(p.getTransformedVertices());
@@ -114,9 +149,8 @@ public class Ship extends Entity {
                 shapeRenderer.circle(c.x, c.y, c.radius);
             }
 
-        } else {
+        } else if(!gameHandler.isGameOver()) {
             shapeRenderer.polygon(polygon.getTransformedVertices());
-
         }
 
         game.getSpriteBatch().end();
@@ -129,7 +163,7 @@ public class Ship extends Entity {
         if (key == inputHandler.LEFT) angle += ROTATE_SPEED;
         else if (key == inputHandler.RIGHT) angle -= ROTATE_SPEED;
         else if (key == inputHandler.UP) thrust();
-        else if (key == inputHandler.FIRE) {
+        else if (key == inputHandler.FIRE && !dying && !immune) {
             fire();
         }
     }
@@ -156,8 +190,8 @@ public class Ship extends Entity {
             accel = 0;
             for (int i = 0; i < splinters.size(); i++) {
                 float moveAngle = splinterAngles[i] * 1.5f * (float) Math.PI;
-                float moveX = (float) Math.cos(moveAngle) * 30.5f * game.deltaTIme;
-                float moveY = (float) Math.sin(moveAngle) * 30.5f * game.deltaTIme;
+                float moveX = (float) Math.cos(moveAngle) * 30.5f * game.deltaTime;
+                float moveY = (float) Math.sin(moveAngle) * 30.5f * game.deltaTime;
                 splinters.get(i).translate(moveX, moveY);
                 splinters.get(i).rotate(1.8f);
             }
@@ -165,8 +199,8 @@ public class Ship extends Entity {
                 if (TimeUtils.timeSinceMillis(explosionCreateTime[i]) <= explosionLifetime[i]) {
                     Circle c = explosion.get(i);
                     float moveAngle = explosionAngles[i] * c.radius * (float) Math.PI;
-                    float moveX = (float) Math.cos(moveAngle) * 88.5f * game.deltaTIme;
-                    float moveY = (float) Math.sin(moveAngle) * 88.5f * game.deltaTIme;
+                    float moveX = (float) Math.cos(moveAngle) * 88.5f * game.deltaTime;
+                    float moveY = (float) Math.sin(moveAngle) * 88.5f * game.deltaTime;
                     c.setPosition(c.x + moveX, c.y + moveY);
                 } else {
                     explosion.get(i).setPosition(-1000, -1000);
@@ -212,13 +246,13 @@ public class Ship extends Entity {
 
     public void die() {
         dying = true;
+        timeOfDeath = TimeUtils.millis();
         splinter();
     }
 
     public void splinter() {
         splinters = new ArrayList<>();
         explosion = new ArrayList<>();
-        //float[] vertices = polygon.getTransformedVertices();
         int numVertices = transformedVertices.length;
         for (int i = 0; i < numVertices; i += 2) {
             int nextIndex = (i + 2) % numVertices;
@@ -255,5 +289,13 @@ public class Ship extends Entity {
             explosionLifetime[i] = MathUtils.random(5, 3500);
 
         }
+    }
+
+    public boolean isDying() {
+        return dying;
+    }
+
+    public long getTimeOfDeath() {
+        return timeOfDeath;
     }
 }

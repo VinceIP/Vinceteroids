@@ -12,7 +12,7 @@ public class AsteroidGenerator {
      * polygon.
      * @return
      */
-    public static float[] generateVertices(){
+    public static float[] generateRandomVertices(){
         float[] vertices = new float[NUM_VERTICES*2];
 
         for (int i = 0; i < NUM_VERTICES; i++) {

@@ -2,6 +2,7 @@ package com.vinceteroids.game.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.math.Polygon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameScreen extends ScreenAdapter {
 
@@ -23,6 +25,7 @@ public class GameScreen extends ScreenAdapter {
     ShapeRenderer shapeRenderer;
     SpriteBatch spriteBatch;
     BitmapFont font;
+    List<Entity> entityListCopy;
 
     float[] vertices = {
             0f, 20f,
@@ -37,6 +40,11 @@ public class GameScreen extends ScreenAdapter {
 
     public GameScreen() {
         this.game = Vinceteroids.get();
+        reset();
+        entityListCopy = new CopyOnWriteArrayList<>();
+    }
+
+    public void reset() {
         //Game objects are created here
         this.gameHandler = new GameHandler();
         this.camera = game.getCamera();
@@ -45,7 +53,6 @@ public class GameScreen extends ScreenAdapter {
         this.spriteBatch = game.getSpriteBatch();
         bonusShip = new Polygon(vertices);
         renderUi = true;
-
     }
 
     @Override
@@ -54,10 +61,8 @@ public class GameScreen extends ScreenAdapter {
         gameHandler.update();
 
         //Safe handling of the entity list
-        List<Entity> entityListCopy;
-        synchronized (game.getEntityList()) {
-            entityListCopy = new ArrayList<>(game.getEntityList());
-        }
+        entityListCopy.clear();
+        entityListCopy.addAll(game.getEntityList());
 
         //Erase the previous frame and render a new one
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -74,25 +79,36 @@ public class GameScreen extends ScreenAdapter {
 
     }
 
-    private void drawUi(){
+    private void drawUi() {
         spriteBatch.begin();
         if (renderUi) {
-            float uiX = game.getScreenCenter().x * 0.02f;
-            float uiY = game.getScreenCenter().y * 1.98f;
-            font.draw(spriteBatch,
-                    "Score: " + gameHandler.getScore() +
-                            "\nShips: ",
-                    uiX, uiY
-            );
-            spriteBatch.end();
-            shapeRenderer.begin();
-            for (int i = 0; i < gameHandler.getNumShips(); i++) {
-                Polygon p = new Polygon(vertices);
-                p.setScale(0.45f, 0.45f);
-                p.setPosition(uiX + 55 + (i * 22f), uiY + (uiY * -0.043f));
-                shapeRenderer.polygon(p.getTransformedVertices());
+            if (!gameHandler.isGameOver()) {
+                float uiX = game.getScreenCenter().x * 0.02f;
+                float uiY = game.getScreenCenter().y * 1.98f;
+                font.draw(spriteBatch,
+                        "Score: " + gameHandler.getScore() +
+                                "\nShips: ",
+                        uiX, uiY
+                );
+                spriteBatch.end();
+                shapeRenderer.begin();
+                shapeRenderer.setColor(Color.WHITE);
+                for (int i = 0; i < gameHandler.getNumShips(); i++) {
+                    Polygon p = new Polygon(vertices);
+                    p.setScale(0.45f, 0.45f);
+                    p.setPosition(uiX + 55 + (i * 22f), uiY + (uiY * -0.043f));
+                    shapeRenderer.polygon(p.getTransformedVertices());
+                }
+            } else {
+                float uiX = game.getScreenCenter().x;
+                float uiY = game.getScreenCenter().y;
+                font.draw(spriteBatch,
+                        "Game Over\nPress any key",
+                        uiX, uiY);
+                spriteBatch.end();
             }
         }
+
         shapeRenderer.end();
     }
 
