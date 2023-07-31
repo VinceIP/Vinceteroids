@@ -116,9 +116,9 @@ public class Ship extends Entity implements KeyListener{
         font.draw(game.getSpriteBatch(), "Ship speed = " + accel + "\n" +
                         "Ship angle: " + angle + "\n" +
                         "x: " + (int) polygon.getX() +
-                        "\ny: " + (int) polygon.getY() + "level: " + gameHandler.getGameLevel(),
+                        "\ny: " + (int) polygon.getY() + "\nlevel: " + gameHandler.getGameLevel() + "\nfps: " + Gdx.graphics.getFramesPerSecond(),
                 (game.getScreenCenter().x - (int) (game.getScreenCenter().x * 0.98)),
-                (game.getScreenCenter().y + (int) (game.getScreenCenter().y * -0.73)));
+                (game.getScreenCenter().y + (int) (game.getScreenCenter().y * -0.68)));
         ////
 
         if (immune) {
